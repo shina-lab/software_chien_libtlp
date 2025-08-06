@@ -1,0 +1,1 @@
+/usr/bin/cc -Wall -O -g  -rdynamic CMakeFiles/module-list.dir/apps/module-list.c.o  -o module-list libtlp.a 

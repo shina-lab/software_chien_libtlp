@@ -1,0 +1,44 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+../include/libtlp.h
+stdint.h
+-
+netinet/in.h
+-
+tlp.h
+-
+
+../include/tlp.h
+stdint.h
+-
+
+/home/shinalab/nettlp/libtlp/lib/libtlp.c
+stdio.h
+-
+errno.h
+-
+string.h
+-
+unistd.h
+-
+sys/types.h
+-
+sys/socket.h
+-
+sys/uio.h
+-
+poll.h
+-
+libtlp.h
+-
+tlp.h
+-
+libkern/OSByteOrder.h
+-
+

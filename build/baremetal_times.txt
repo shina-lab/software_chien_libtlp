@@ -1,0 +1,120 @@
+./syscall-check -r 192.168.20.1 -b 01:00 -s /home/shinalab/System.map
+    Trial 1: 0.008750 seconds
+    Trial 2: 0.005348 seconds
+    Trial 3: 0.005736 seconds
+    Trial 4: 0.005183 seconds
+    Trial 5: 0.004872 seconds
+Statistics:
+    min: 0.004872 seconds
+    max: 0.008750 seconds
+    avg: 0.005977 seconds
+    med: 0.005348 seconds
+
+./file-check -r 192.168.20.1 -b 01:00 -s /home/shinalab/System.map
+    Trial 1: 0.133306 seconds
+    Trial 2: 0.142478 seconds
+    Trial 3: 0.153491 seconds
+    Trial 4: 0.139401 seconds
+    Trial 5: 0.141747 seconds
+Statistics:
+    min: 0.133306 seconds
+    max: 0.153491 seconds
+    avg: 0.142084 seconds
+    med: 0.141747 seconds
+
+./tty-drivers -r 192.168.20.1 -b 01:00 -s /home/shinalab/System.map
+    Trial 1: 0.007587 seconds
+    Trial 2: 0.005711 seconds
+    Trial 3: 0.005550 seconds
+    Trial 4: 0.005545 seconds
+    Trial 5: 0.005526 seconds
+Statistics:
+    min: 0.005526 seconds
+    max: 0.007587 seconds
+    avg: 0.005983 seconds
+    med: 0.005550 seconds
+
+./netfilter-hijack -r 192.168.20.1 -b 01:00 -s /home/shinalab/System.map
+    Trial 1: 0.005360 seconds
+    Trial 2: 0.005716 seconds
+    Trial 3: 0.005460 seconds
+    Trial 4: 0.005583 seconds
+    Trial 5: 0.005506 seconds
+Statistics:
+    min: 0.005360 seconds
+    max: 0.005716 seconds
+    avg: 0.005525 seconds
+    med: 0.005506 seconds
+
+./tcp-op -r 192.168.20.1 -b 01:00 -s /home/shinalab/System.map
+    Trial 1: 0.010021 seconds
+    Trial 2: 0.009856 seconds
+    Trial 3: 0.009776 seconds
+    Trial 4: 0.009698 seconds
+    Trial 5: 0.009741 seconds
+Statistics:
+    min: 0.009698 seconds
+    max: 0.010021 seconds
+    avg: 0.009818 seconds
+    med: 0.009776 seconds
+
+./process-list -r 192.168.20.1 -b 01:00 -s /home/shinalab/System.map
+    Trial 1: 0.026365 seconds
+    Trial 2: 0.031236 seconds
+    Trial 3: 0.033532 seconds
+    Trial 4: 0.028730 seconds
+    Trial 5: 0.032322 seconds
+Statistics:
+    min: 0.026365 seconds
+    max: 0.033532 seconds
+    avg: 0.030437 seconds
+    med: 0.031236 seconds
+
+./priv-escalation -r 192.168.20.1 -b 01:00 -s /home/shinalab/System.map
+    Trial 1: 0.050217 seconds
+    Trial 2: 0.051874 seconds
+    Trial 3: 0.052471 seconds
+    Trial 4: 0.036656 seconds
+    Trial 5: 0.039609 seconds
+Statistics:
+    min: 0.036656 seconds
+    max: 0.052471 seconds
+    avg: 0.046165 seconds
+    med: 0.050217 seconds
+
+./module-list -r 192.168.20.1 -b 01:00 -s /home/shinalab/System.map
+    Trial 1: 0.032052 seconds
+    Trial 2: 0.030163 seconds
+    Trial 3: 0.029878 seconds
+    Trial 4: 0.029209 seconds
+    Trial 5: 0.027839 seconds
+Statistics:
+    min: 0.027839 seconds
+    max: 0.032052 seconds
+    avg: 0.029828 seconds
+    med: 0.029878 seconds
+
+./keyboard-sniffer -r 192.168.20.1 -b 01:00 -s /home/shinalab/System.map
+    Trial 1: 0.010156 seconds
+    Trial 2: 0.009887 seconds
+    Trial 3: 0.011141 seconds
+    Trial 4: 0.011201 seconds
+    Trial 5: 0.010515 seconds
+Statistics:
+    min: 0.009887 seconds
+    max: 0.011201 seconds
+    avg: 0.010580 seconds
+    med: 0.010515 seconds
+
+./vfs-hook -r 192.168.20.1 -b 01:00 -s /home/shinalab/System.map
+    Trial 1: 0.005189 seconds
+    Trial 2: 0.005320 seconds
+    Trial 3: 0.005340 seconds
+    Trial 4: 0.005315 seconds
+    Trial 5: 0.005354 seconds
+Statistics:
+    min: 0.005189 seconds
+    max: 0.005354 seconds
+    avg: 0.005303 seconds
+    med: 0.005320 seconds
+

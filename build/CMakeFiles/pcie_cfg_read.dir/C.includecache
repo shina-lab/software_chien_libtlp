@@ -1,0 +1,44 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+../include/libtlp.h
+stdint.h
+-
+netinet/in.h
+-
+tlp.h
+-
+
+../include/tlp.h
+stdint.h
+-
+
+/home/shinalab/nettlp/libtlp/apps/pcie_cfg_read.c
+stdio.h
+-
+stdlib.h
+-
+string.h
+-
+unistd.h
+-
+arpa/inet.h
+-
+libtlp.h
+-
+util.h
+/home/shinalab/nettlp/libtlp/apps/util.h
+
+/home/shinalab/nettlp/libtlp/apps/util.h
+libtlp.h
+-
+stdio.h
+-
+arpa/inet.h
+-
+

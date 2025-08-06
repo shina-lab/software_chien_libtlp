@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <arpa/inet.h>
+#include <time.h>  /* for turnaround time */
 
 #ifdef __APPLE__
 #define _AC(X,Y)        X
@@ -26,7 +27,8 @@
 /* from arch/x86/include/asm/page_types.h */
 #define PAGE_OFFSET	((unsigned long)__PAGE_OFFSET)
 
-#define phys_base	0x1000000	/* x86 */
+// #define phys_base	0x1000000	/* x86 */
+#define phys_base	0x4A00000	/* x86 */
 
 /* from arch/x86/mm/physaddr.c */
 unsigned long __phys_addr(unsigned long x)
@@ -98,12 +100,19 @@ struct list_head {
 
 
 /* task struct offset */
-#define OFFSET_HEAD_STATE	16
-#define OFFSET_HEAD_PID		2216
-#define OFFSET_HEAD_CHILDREN	2240
-#define OFFSET_HEAD_SIBLING	2256
-#define OFFSET_HEAD_COMM	2632
-#define OFFSET_HEAD_REAL_PARENT	2224
+// #define OFFSET_HEAD_STATE	16
+// #define OFFSET_HEAD_PID		2216
+// #define OFFSET_HEAD_CHILDREN	2240
+// #define OFFSET_HEAD_SIBLING	2256
+// #define OFFSET_HEAD_COMM	2632
+// #define OFFSET_HEAD_REAL_PARENT	2224
+// new offsets for Linux 6.2.0-33-generic
+#define OFFSET_HEAD_STATE	24
+#define OFFSET_HEAD_PID		2456
+#define OFFSET_HEAD_CHILDREN	2488
+#define OFFSET_HEAD_SIBLING	2504
+#define OFFSET_HEAD_COMM	2960
+#define OFFSET_HEAD_REAL_PARENT	2472
 
 #define TASK_COMM_LEN		16
 
@@ -398,6 +407,9 @@ int main(int argc, char **argv)
 		}
 	}
 
+	/* Get start time */
+	struct timespec start, end;
+	clock_gettime(CLOCK_MONOTONIC, &start);
 
 	ret = nettlp_init(&nt);
 	if (ret < 0) {
@@ -417,6 +429,11 @@ int main(int argc, char **argv)
 	task(&nt, t.vhead, t.vhead);
 	//print_task_struct(&nt, t);
 	//dump_task_struct(&t);
+
+	/* Get end time and calculate turnaround time */
+	clock_gettime(CLOCK_MONOTONIC, &end);
+	double elapsed = (end.tv_sec - start.tv_sec) + (end.tv_nsec - start.tv_nsec) / 1e9;
+	printf("Time elapsed: %f seconds\n", elapsed);
 
 	return 0;
 }

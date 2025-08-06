@@ -1,0 +1,1 @@
+/usr/bin/cc -Wall -O -g  -rdynamic CMakeFiles/tty-drivers.dir/apps/tty-drivers.c.o  -o tty-drivers libtlp.a 

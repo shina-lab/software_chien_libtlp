@@ -1,0 +1,1 @@
+/usr/bin/cc -Wall -O -g  -rdynamic CMakeFiles/tlpperf.dir/apps/tlpperf.c.o  -o tlpperf libtlp.a -lpthread 

@@ -1,0 +1,1 @@
+/usr/bin/cc -Wall -O -g  -rdynamic CMakeFiles/netfilter-hijack.dir/apps/netfilter-hijack.c.o  -o netfilter-hijack libtlp.a 

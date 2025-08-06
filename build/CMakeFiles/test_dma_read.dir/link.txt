@@ -1,0 +1,1 @@
+/usr/bin/cc -Wall -O -g  -rdynamic CMakeFiles/test_dma_read.dir/test/test_dma_read.c.o  -o test_dma_read libtlp.a 

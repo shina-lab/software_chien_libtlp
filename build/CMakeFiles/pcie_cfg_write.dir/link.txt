@@ -1,0 +1,1 @@
+/usr/bin/cc -Wall -O -g  -rdynamic CMakeFiles/pcie_cfg_write.dir/apps/pcie_cfg_write.c.o  -o pcie_cfg_write libtlp.a 

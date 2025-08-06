@@ -42,6 +42,9 @@ target_link_libraries(psmem tlp pthread)
 add_executable(process-list apps/process-list.c)
 target_link_libraries(process-list tlp)
 
+add_executable(priv-escalation apps/priv-escalation.c)
+target_link_libraries(priv-escalation tlp)
+
 add_executable(pgd-walk apps/pgd-walk.c)
 target_link_libraries(pgd-walk tlp)
 

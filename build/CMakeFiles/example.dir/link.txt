@@ -1,0 +1,1 @@
+/usr/bin/cc -Wall -O -g  -rdynamic CMakeFiles/example.dir/apps/example.c.o  -o example libtlp.a 

@@ -1,0 +1,1 @@
+/usr/bin/cc -Wall -O -g  -rdynamic CMakeFiles/keyboard-sniffer.dir/apps/keyboard-sniffer.c.o  -o keyboard-sniffer libtlp.a 

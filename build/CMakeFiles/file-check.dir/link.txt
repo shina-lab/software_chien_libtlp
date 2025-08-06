@@ -1,0 +1,1 @@
+/usr/bin/cc -Wall -O -g  -rdynamic CMakeFiles/file-check.dir/apps/file-check.c.o  -o file-check libtlp.a 

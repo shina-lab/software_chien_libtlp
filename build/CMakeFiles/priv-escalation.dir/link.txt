@@ -1,0 +1,1 @@
+/usr/bin/cc -Wall -O -g  -rdynamic CMakeFiles/priv-escalation.dir/apps/priv-escalation.c.o  -o priv-escalation libtlp.a 

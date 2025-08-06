@@ -1,0 +1,1 @@
+/usr/bin/cc -Wall -O -g  -rdynamic CMakeFiles/pcie_cfg_read.dir/apps/pcie_cfg_read.c.o  -o pcie_cfg_read libtlp.a 

@@ -1,0 +1,1 @@
+/usr/bin/cc -Wall -O -g  -rdynamic CMakeFiles/vfs-hook.dir/apps/vfs-hook.c.o  -o vfs-hook libtlp.a 

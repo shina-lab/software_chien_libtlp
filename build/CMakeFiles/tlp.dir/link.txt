@@ -1,0 +1,2 @@
+/usr/bin/ar qc libtlp.a  CMakeFiles/tlp.dir/lib/libtlp.c.o
+/usr/bin/ranlib libtlp.a

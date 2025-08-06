@@ -1,0 +1,28 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+../include/libtlp.h
+stdint.h
+-
+netinet/in.h
+-
+tlp.h
+-
+
+../include/tlp.h
+stdint.h
+-
+
+/home/shinalab/nettlp/libtlp/test/test_msg_msix.c
+stdio.h
+-
+arpa/inet.h
+-
+libtlp.h
+-
+

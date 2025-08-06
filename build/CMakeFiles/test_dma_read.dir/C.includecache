@@ -1,0 +1,42 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+../include/libtlp.h
+stdint.h
+-
+netinet/in.h
+-
+tlp.h
+-
+
+../include/tlp.h
+stdint.h
+-
+
+/home/shinalab/nettlp/libtlp/test/test_dma_read.c
+stdio.h
+-
+stdlib.h
+-
+stdint.h
+-
+string.h
+-
+unistd.h
+-
+arpa/inet.h
+-
+libtlp.h
+-
+util.h
+/home/shinalab/nettlp/libtlp/test/util.h
+
+/home/shinalab/nettlp/libtlp/test/util.h
+libtlp.h
+-
+

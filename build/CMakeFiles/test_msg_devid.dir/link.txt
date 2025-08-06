@@ -1,0 +1,1 @@
+/usr/bin/cc -Wall -O -g  -rdynamic CMakeFiles/test_msg_devid.dir/test/test_msg_devid.c.o  -o test_msg_devid libtlp.a 

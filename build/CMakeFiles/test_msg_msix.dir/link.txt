@@ -1,0 +1,1 @@
+/usr/bin/cc -Wall -O -g  -rdynamic CMakeFiles/test_msg_msix.dir/test/test_msg_msix.c.o  -o test_msg_msix libtlp.a 

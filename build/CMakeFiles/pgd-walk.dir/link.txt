@@ -1,0 +1,1 @@
+/usr/bin/cc -Wall -O -g  -rdynamic CMakeFiles/pgd-walk.dir/apps/pgd-walk.c.o  -o pgd-walk libtlp.a 
