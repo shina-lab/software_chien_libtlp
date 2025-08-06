@@ -15,6 +15,8 @@
 
 #include <libtlp.h>
 
+// #define PRINT_OUT
+
 
 /* from arch_x86/include/asm/page_64_types.h */
 #define KERNEL_IMAGE_SIZE	(512 * 1024 * 1024)
@@ -170,7 +172,9 @@ void dump_tty_driver(struct nettlp *net, uintptr_t p_tty_driver) {
 	}
 	name_buf[SIZE_NAME_BUF - 1] = '\0';
 
+#ifdef PRINT_OUT
 	printf("name: %16s, type: %u, max_array_size: %u\n", name_buf, type, num);
+#endif
 	
 	uintptr_t v_ttys;
 	ret = dma_read(net, p_tty_driver + OFFSET_TTYS, &v_ttys, sizeof(v_ttys));
@@ -213,8 +217,10 @@ void dump_tty_driver(struct nettlp *net, uintptr_t p_tty_driver) {
 		if (ret < sizeof(receive_buf)) {
 			break;
 		}
+#ifdef PRINT_OUT
 		printf("--- receive_buf: 0x%lx, within kernel text region? %c\n", receive_buf,
 				(KERN_TEXT_START <= receive_buf && receive_buf <= KERN_TEXT_END) ? 'Y' : 'C');
+#endif
 	}
 }
 
@@ -278,15 +284,15 @@ int main(int argc, char **argv)
 		}
 	}
 
-	/* Get start time */
-	struct timespec start, end;
-	clock_gettime(CLOCK_MONOTONIC, &start);
-
 	ret = nettlp_init(&nt);
 	if (ret < 0) {
 		perror("nettlp_init");
 		return ret;
 	}
+
+	/* Get start time */
+	struct timespec start, end;
+	clock_gettime(CLOCK_MONOTONIC, &start);
 
 	uintptr_t v_tty_drivers = find_tty_drivers_from_systemmap(map);
     if (!v_tty_drivers) {
@@ -294,13 +300,10 @@ int main(int argc, char **argv)
         return -1;
     }
     uintptr_t p_tty_drivers = __phys_addr(v_tty_drivers);
-	printf("v: %lx, p: %lx\n", v_tty_drivers, p_tty_drivers);
 
 	uintptr_t p_init_list = get_init_list(&nt, p_tty_drivers);
-	printf("p: 0x%lx\n", p_init_list);
 
     uintptr_t p_init_tty_driver = LIST_TO_DRIVERS(p_init_list);
-    printf("p: 0x%lx\n", p_init_tty_driver);
 
 	uintptr_t pcurr = p_init_tty_driver;
 	int cnt = 10;

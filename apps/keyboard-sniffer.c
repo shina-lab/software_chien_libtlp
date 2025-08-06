@@ -14,6 +14,7 @@
 
 #include <libtlp.h>
 
+// #define PRINT_OUT
 
 /* from arch_x86/include/asm/page_64_types.h */
 #define KERNEL_IMAGE_SIZE	(512 * 1024 * 1024)
@@ -245,7 +246,9 @@ void dump_nb(struct nettlp *nt, uintptr_t pcurr) {
         return;
     }
 
+#ifdef PRINT_OUT
     printf("notifier call: 0x%lx, priority: %ld\n", notifier_call, prio);
+#endif
 }
 
 uintptr_t get_pnext(struct nettlp *nt, uintptr_t vpgd, uintptr_t pcurr) {
@@ -320,15 +323,15 @@ int main(int argc, char **argv)
 		}
 	}
 
-	/* Get start time */
-	struct timespec start, end;
-	clock_gettime(CLOCK_MONOTONIC, &start);
-
 	ret = nettlp_init(&nt);
 	if (ret < 0) {
 		perror("nettlp_init");
 		return ret;
 	}
+
+	/* Get start time */
+	struct timespec start, end;
+	clock_gettime(CLOCK_MONOTONIC, &start);
 
     uintptr_t vpgd = get_vpgd(&nt, map);
 

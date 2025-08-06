@@ -1,0 +1,140 @@
+./syscall-check -r 192.168.20.1 -b 01:00 -s /home/shinalab/System.map
+    Trial 1: 0.008245 seconds
+    Trial 2: 0.005291 seconds
+    Trial 3: 0.005311 seconds
+    Trial 4: 0.005310 seconds
+    Trial 5: 0.005822 seconds
+Statistics:
+    min: 0.005291 seconds
+    max: 0.008245 seconds
+    avg: 0.005995 seconds
+    med: 0.005311 seconds
+    stddev: .001277215721 seconds
+    stderr: .000571 seconds
+
+./file-check -r 192.168.20.1 -b 01:00 -s /home/shinalab/System.map
+    Trial 1: 0.159239 seconds
+    Trial 2: 0.122474 seconds
+    Trial 3: 0.128208 seconds
+    Trial 4: 0.200916 seconds
+    Trial 5: 0.142289 seconds
+Statistics:
+    min: 0.122474 seconds
+    max: 0.200916 seconds
+    avg: 0.150625 seconds
+    med: 0.142289 seconds
+    stddev: .031495539366 seconds
+    stderr: .014085 seconds
+
+./tty-drivers -r 192.168.20.1 -b 01:00 -s /home/shinalab/System.map
+    Trial 1: 0.008141 seconds
+    Trial 2: 0.006134 seconds
+    Trial 3: 0.006253 seconds
+    Trial 4: 0.005524 seconds
+    Trial 5: 0.006040 seconds
+Statistics:
+    min: 0.005524 seconds
+    max: 0.008141 seconds
+    avg: 0.006418 seconds
+    med: 0.006134 seconds
+    stddev: .001002337268 seconds
+    stderr: .000448 seconds
+
+./netfilter-hijack -r 192.168.20.1 -b 01:00 -s /home/shinalab/System.map
+    Trial 1: 0.006145 seconds
+    Trial 2: 0.006397 seconds
+    Trial 3: 0.007245 seconds
+    Trial 4: 0.007467 seconds
+    Trial 5: 0.007288 seconds
+Statistics:
+    min: 0.006145 seconds
+    max: 0.007467 seconds
+    avg: 0.006908 seconds
+    med: 0.007245 seconds
+    stddev: .000594503994 seconds
+    stderr: .000265 seconds
+
+./tcp-op -r 192.168.20.1 -b 01:00 -s /home/shinalab/System.map
+    Trial 1: 0.015614 seconds
+    Trial 2: 0.015462 seconds
+    Trial 3: 0.015228 seconds
+    Trial 4: 0.013536 seconds
+    Trial 5: 0.013563 seconds
+Statistics:
+    min: 0.013536 seconds
+    max: 0.015614 seconds
+    avg: 0.014680 seconds
+    med: 0.015228 seconds
+    stddev: .001041705332 seconds
+    stderr: .000465 seconds
+
+./process-list -r 192.168.20.1 -b 01:00 -s /home/shinalab/System.map
+    Trial 1: 0.028259 seconds
+    Trial 2: 0.028137 seconds
+    Trial 3: 0.028721 seconds
+    Trial 4: 0.028096 seconds
+    Trial 5: 0.028051 seconds
+Statistics:
+    min: 0.028051 seconds
+    max: 0.028721 seconds
+    avg: 0.028252 seconds
+    med: 0.028137 seconds
+    stddev: .000272934057 seconds
+    stderr: .000122 seconds
+
+./priv-escalation -r 192.168.20.1 -b 01:00 -s /home/shinalab/System.map
+    Trial 1: 0.039493 seconds
+    Trial 2: 0.039487 seconds
+    Trial 3: 0.046367 seconds
+    Trial 4: 0.034632 seconds
+    Trial 5: 0.036739 seconds
+Statistics:
+    min: 0.034632 seconds
+    max: 0.046367 seconds
+    avg: 0.039343 seconds
+    med: 0.039487 seconds
+    stddev: .004425889741 seconds
+    stderr: .001979 seconds
+
+./module-list -r 192.168.20.1 -b 01:00 -s /home/shinalab/System.map
+    Trial 1: 0.042088 seconds
+    Trial 2: 0.027000 seconds
+    Trial 3: 0.026791 seconds
+    Trial 4: 0.025494 seconds
+    Trial 5: 0.051960 seconds
+Statistics:
+    min: 0.025494 seconds
+    max: 0.051960 seconds
+    avg: 0.034666 seconds
+    med: 0.027000 seconds
+    stddev: .011822394004 seconds
+    stderr: .005287 seconds
+
+./keyboard-sniffer -r 192.168.20.1 -b 01:00 -s /home/shinalab/System.map
+    Trial 1: 0.024879 seconds
+    Trial 2: 0.013061 seconds
+    Trial 3: 0.010190 seconds
+    Trial 4: 0.011217 seconds
+    Trial 5: 0.009978 seconds
+Statistics:
+    min: 0.009978 seconds
+    max: 0.024879 seconds
+    avg: 0.013865 seconds
+    med: 0.011217 seconds
+    stddev: .006276559567 seconds
+    stderr: .002806 seconds
+
+./vfs-hook -r 192.168.20.1 -b 01:00 -s /home/shinalab/System.map
+    Trial 1: 0.004956 seconds
+    Trial 2: 0.004821 seconds
+    Trial 3: 0.004950 seconds
+    Trial 4: 0.004948 seconds
+    Trial 5: 0.004828 seconds
+Statistics:
+    min: 0.004821 seconds
+    max: 0.004956 seconds
+    avg: 0.004900 seconds
+    med: 0.004948 seconds
+    stddev: .000069577295 seconds
+    stderr: .000031 seconds
+

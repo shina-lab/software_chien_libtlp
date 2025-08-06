@@ -14,6 +14,8 @@
 
 #include <libtlp.h>
 
+// #define PRINT_OUT
+
 
 /* from arch_x86/include/asm/page_64_types.h */
 #define KERNEL_IMAGE_SIZE	(512 * 1024 * 1024)
@@ -161,15 +163,15 @@ int main(int argc, char **argv)
 		}
 	}
 
-	/* Get start time */
-	struct timespec start, end;
-	clock_gettime(CLOCK_MONOTONIC, &start);
-
 	ret = nettlp_init(&nt);
 	if (ret < 0) {
 		perror("nettlp_init");
 		return ret;
 	}
+
+	/* Get start time */
+	struct timespec start, end;
+	clock_gettime(CLOCK_MONOTONIC, &start);
 
 	uintptr_t v_init_net = find_init_net_from_systemmap(map);
 	if (v_init_net == 0) {
@@ -199,7 +201,9 @@ int main(int argc, char **argv)
         if (ret < num_entries * SIZE_HOOK_STRUCT) return -1;
         for (int j = 0; j < num_entries; j++) {
             uintptr_t ent = *(uintptr_t *)((uintptr_t)hooks + j * SIZE_HOOK_STRUCT);
+#ifdef PRINT_OUT
             printf("IPV4 nf_hook_entry is 0x%lx\n", ent);
+#endif
         }
         free(hooks);
     }
@@ -221,7 +225,9 @@ int main(int argc, char **argv)
         if (ret < num_entries * SIZE_HOOK_STRUCT) return -1;
         for (int j = 0; j < num_entries; j++) {
             uintptr_t ent = *(uintptr_t *)((uintptr_t)hooks + j * SIZE_HOOK_STRUCT);
+#ifdef PRINT_OUT
             printf("IPV6 nf_hook_entry is 0x%lx\n", ent);
+#endif
         }
         free(hooks);
     }

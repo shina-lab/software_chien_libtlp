@@ -14,6 +14,8 @@
 
 #include <libtlp.h>
 
+// #define PRINT_OUT
+
 
 /* from arch_x86/include/asm/page_64_types.h */
 #define KERNEL_IMAGE_SIZE	(512 * 1024 * 1024)
@@ -157,15 +159,15 @@ int main(int argc, char **argv)
 		}
 	}
 
-	/* Get start time */
-	struct timespec start, end;
-	clock_gettime(CLOCK_MONOTONIC, &start);
-
 	ret = nettlp_init(&nt);
 	if (ret < 0) {
 		perror("nettlp_init");
 		return ret;
 	}
+
+	/* Get start time */
+	struct timespec start, end;
+	clock_gettime(CLOCK_MONOTONIC, &start);
 
 	uintptr_t v_sys_call_table = find_sys_call_table_from_systemmap(map);
 	if (v_sys_call_table == 0) {
@@ -182,8 +184,10 @@ int main(int argc, char **argv)
 
     for (int i = 0; i < SYSCALL_NR; i++) {
         uintptr_t p = syscall_pointers[i];
+#ifdef PRINT_OUT
         printf("syscall pointer is 0x%lx, within kernel text region?: %s\n", 
             p, (KERN_TEXT_START <= p && p <= KERN_TEXT_END) ? "Y" : "N");
+#endif
     }
 
 	/* Get end time and calculate turnaround time */

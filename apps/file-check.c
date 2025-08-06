@@ -14,6 +14,8 @@
 
 #include <libtlp.h>
 
+// #define PRINT_OUT
+
 
 /* from arch_x86/include/asm/page_64_types.h */
 #define KERNEL_IMAGE_SIZE	(512 * 1024 * 1024)
@@ -235,29 +237,6 @@ struct task_struct {
     uintptr_t vfiles, pfiles;
 };
 
-#define print_task_value(t, name) \
-	printf(#name "  %#lx %#lx\n", t->v##name, t->p##name)
-
-void dump_task_struct(struct task_struct *t)
-{
-	print_task_value(t, head);
-	print_task_value(t, state);
-	print_task_value(t, pid);
-	print_task_value(t, children);
-	print_task_value(t, sibling);
-	print_task_value(t, comm);
-	print_task_value(t, real_parent);
-
-	printf("children_next %#lx %#lx\n",
-	       t->children_next, __phys_addr(t->children_next));
-	printf("children_prev %#lx %#lx\n",
-	       t->children_prev, __phys_addr(t->children_prev));
-	printf("sibling_next %#lx %#lx\n",
-	       t->sibling_next, __phys_addr(t->sibling_next));
-	printf("sibling_prev %#lx %#lx\n",
-	       t->sibling_prev, __phys_addr(t->sibling_prev));
-}
-
 #define check_task_value(t, name)					\
 	do {								\
 		if(t->v##name == 0) {					\
@@ -326,7 +305,9 @@ int fill_task_struct(struct nettlp *nt, uintptr_t vhead,
 		fprintf(stderr, "failed to read pid from %#lx\n", t->ppid);
 		return -1;
 	}
+#ifdef PRINT_OUT
     printf("pid: %d\n", pid);
+#endif 
 
     /* get list of fd names */
     t->vfiles = vhead + OFFSET_FILES;
@@ -353,7 +334,9 @@ int fill_task_struct(struct nettlp *nt, uintptr_t vhead,
 	if (ret < sizeof(num_fds)) {
 		return -1;
 	}
+#ifdef PRINT_OUT
 	printf("--- max number of entries: %ld\n", num_fds);
+#endif
 
 	uintptr_t v_fd;
 	ret = dma_read(nt, p_fdtable + OFFSET_FD, &v_fd, sizeof(v_fd));
@@ -400,7 +383,9 @@ int fill_task_struct(struct nettlp *nt, uintptr_t vhead,
 			return -1;
 		}
 		name_buf[SIZE_NAME_BUF - 1] = '\0';
+#ifdef PRINT_OUT
 		printf("--- file name: %s\n", name_buf);
+#endif
 	}
 
 	return 0;
@@ -507,15 +492,15 @@ int main(int argc, char **argv)
 		}
 	}
 
-	/* Get start time */
-	struct timespec start, end;
-	clock_gettime(CLOCK_MONOTONIC, &start);
-
 	ret = nettlp_init(&nt);
 	if (ret < 0) {
 		perror("nettlp_init");
 		return ret;
 	}
+
+	/* Get start time */
+	struct timespec start, end;
+	clock_gettime(CLOCK_MONOTONIC, &start);
 
 	uintptr_t v_init_task = find_init_task_from_systemmap(map);
 	if (v_init_task == 0) {

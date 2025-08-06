@@ -5,17 +5,21 @@ import typing
 def get_median_times(filename):
     with open(filename, 'r') as f:
         medians = []
+        stderrs = []
         for line in f:
             stripped = line.strip()
             if 'med:' in stripped:
                 median = stripped.replace(" ", "").replace("med:", "").replace("seconds", "")
                 medians.append(float(median) * 1000)  # convert seconds to milli-seconds
-        print(medians)
-        return medians
 
-medians_bare = get_median_times('baremetal_times.txt')
-medians_shallow = get_median_times('hypercopilot_shallow.txt')
-medians_full = get_median_times('hypercopilot_full.txt')
+            if 'stderr' in stripped:
+                stderr = stripped.replace(" ", "").replace("stderr:", "").replace("seconds", "")
+                stderrs.append(float(stderr) * 1000)  # convert seconds to milli-seconds
+        return medians, stderrs
+
+medians_bare, errs_bare = get_median_times('bare_new.txt')
+medians_shallow, errs_shallow = get_median_times('shallow_new.txt')
+medians_full, errs_full = get_median_times('full_new.txt')
 
 # programs = ["Prog{}".format(i+1) for i in range(len(medians_bare))]
 programs = ["syscall-check", "file-check", "tty-drivers", "netfilter-hijack", "tcp-op", 
@@ -26,9 +30,12 @@ width = 0.4
 
 fig, ax = plt.subplots(figsize=(12, 6))
 
-bars1 = ax.bar(x - width, medians_bare, width, label='Bare', color='#3498db', alpha=0.8)
-bars2 = ax.bar(x, medians_shallow, width, label='Shallow', color='#e74c3c', alpha=0.8)
-bars3 = ax.bar(x + width, medians_full, width, label='Full', color='#2ecc71', alpha=0.8)
+bars1 = ax.bar(x - width, medians_bare, width, label='Bare', color='#3498db', alpha=0.8, 
+                      yerr=errs_bare, capsize=5, error_kw={'linewidth': 1})
+bars2 = ax.bar(x, medians_shallow, width, label='Shallow', color='#e74c3c', alpha=0.8, 
+                      yerr=errs_shallow, capsize=5, error_kw={'linewidth': 1})
+bars3 = ax.bar(x + width, medians_full, width, label='Full', color='#2ecc71', alpha=0.8,
+                      yerr=errs_full, capsize=5, error_kw={'linewidth': 1})
 
 def add_value_labels(bars):
     for bar in bars:

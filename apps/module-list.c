@@ -15,6 +15,8 @@
 #include <libtlp.h>
 
 
+// #define PRINT_OUT
+
 /* from arch_x86/include/asm/page_64_types.h */
 #define KERNEL_IMAGE_SIZE	(512 * 1024 * 1024)
 //#define __PAGE_OFFSET_BASE      _AC(0xffff880000000000, UL)
@@ -293,8 +295,9 @@ void dump_mod_list_head(struct nettlp *net, uintptr_t pmod_list_head) {
 		return;
 	}
 	name_buf[SIZE_NAME_BUFFER - 1] = '\0';  // to prevent overflow
-
+#ifdef PRINT_OUT
 	printf("%ld       %.23s         %s\n", state, state_to_str(state), name_buf);
+#endif 
 	return;
 }
 
@@ -358,15 +361,15 @@ int main(int argc, char **argv)
 		}
 	}
 
-	/* Get start time */
-	struct timespec start, end;
-	clock_gettime(CLOCK_MONOTONIC, &start);
-
 	ret = nettlp_init(&nt);
 	if (ret < 0) {
 		perror("nettlp_init");
 		return ret;
 	}
+
+	/* Get start time */
+	struct timespec start, end;
+	clock_gettime(CLOCK_MONOTONIC, &start);
 
 	uintptr_t vpgd = get_vpgd(&nt, map);
 	if (!vpgd) {
@@ -379,8 +382,9 @@ int main(int argc, char **argv)
 		printf("[ERROR]: failed to get initial module, exiting.\n");
 		return -1;
 	}
-
+#ifdef PRINT_OUT
 	printf("state | state_name              | module_name\n");
+#endif
 	uintptr_t p_curr = p_init;
 	do {
 		dump_mod_list_head(&nt, p_curr);

@@ -49,10 +49,27 @@ for prog in "${PROGRAMS[@]}"; do
             median=$(echo "scale=6; (${sorted[$mid-1]} + ${sorted[$mid]}) / 2" | bc)
         fi
 
+        variance=$(printf '%s\n' "${times[@]}" | awk -v avg="$avg" -v count="$count" '
+            {
+                diff = $1 - avg
+                sum += diff * diff
+            }
+            END {
+                variance = sum / (count - 1)
+                print variance 
+            }
+        ')
+
+        variance_float=$(printf "%.12f\n" "$variance")
+        stddev=$(echo "scale=6; sqrt($variance_float)" | bc -l)
+        stderr=$(echo "scale=6; $stddev / sqrt($count)" | bc -l)
+
         echo "    min: $min seconds"
         echo "    max: $max seconds"
         echo "    avg: 0$avg seconds"
         echo "    med: $median seconds"
+        echo "    stddev: $stddev seconds"
+        echo "    stderr: $stderr seconds"
     fi
     echo ""
 done

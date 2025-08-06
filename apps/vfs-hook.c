@@ -14,6 +14,8 @@
 
 #include <libtlp.h>
 
+// #define PRINT_OUT
+
 
 /* from arch_x86/include/asm/page_64_types.h */
 #define KERNEL_IMAGE_SIZE	(512 * 1024 * 1024)
@@ -160,15 +162,15 @@ int main(int argc, char **argv)
 		}
 	}
 
-	/* Get start time */
-	struct timespec start, end;
-	clock_gettime(CLOCK_MONOTONIC, &start);
-
 	ret = nettlp_init(&nt);
 	if (ret < 0) {
 		perror("nettlp_init");
 		return ret;
 	}
+
+	/* Get start time */
+	struct timespec start, end;
+	clock_gettime(CLOCK_MONOTONIC, &start);
 
 	v_proc_root = find_proc_root_from_systemmap(map);
 	if (v_proc_root == 0) {
@@ -178,7 +180,6 @@ int main(int argc, char **argv)
 
     /* Check read pointer */
     uintptr_t p_proc_root = __phys_addr(v_proc_root);
-    printf("Physical address of proc_root is 0x%lx\n", p_proc_root);
 
     uintptr_t p_proc_dir_ops = p_proc_root + OFFSET_HEAD_PROC_DIR_OPS;
     uintptr_t proc_dir_ops_val_v = 0;
@@ -186,7 +187,6 @@ int main(int argc, char **argv)
 	if (ret < sizeof(proc_dir_ops_val_v)) {
 		return -1;
     }
-    printf("Value of proc_dir_ops is: 0x%lx\n", proc_dir_ops_val_v);
 
     uintptr_t proc_dir_ops_val_p = __phys_addr(proc_dir_ops_val_v);
     uintptr_t proc_dir_ops_read_p = proc_dir_ops_val_p + OFFSET_READ;
@@ -196,9 +196,11 @@ int main(int argc, char **argv)
 	if (ret < sizeof(read_pointer)) {
 		return -1;
     }
+#ifdef PRINT_OUT
     printf("Value of .read is: 0x%lx\n", read_pointer);
     printf("Checking if .read pointer is in kernel text region: %s\n", 
             (KERN_TEXT_START <= read_pointer && read_pointer <= KERN_TEXT_END) ? "YES" : "NO");
+#endif
 
 	/* Get end time and calculate turnaround time */
 	clock_gettime(CLOCK_MONOTONIC, &end);

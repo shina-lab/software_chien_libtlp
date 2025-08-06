@@ -14,6 +14,8 @@
 
 #include <libtlp.h>
 
+// #define PRINT_OUT
+
 
 /* from arch_x86/include/asm/page_64_types.h */
 #define KERNEL_IMAGE_SIZE	(512 * 1024 * 1024)
@@ -227,7 +229,9 @@ int fill_task_struct(struct nettlp *nt, uintptr_t vhead,
 
 void print_task_struct_column(void)
 {
+#ifdef PRINT_OUT
 	printf("PhyAddr             PID STAT COMMAND\n");
+#endif
 }
 	
 
@@ -257,8 +261,10 @@ int print_task_struct(struct nettlp *nt, struct task_struct t)
 
 	comm[TASK_COMM_LEN - 1] = '\0';	/* preventing overflow */
 
+#ifdef PRINT_OUT
 	printf("%#016lx %6d %c    %s\n",
 	       t.phead, pid, state_to_char(state), comm);
+#endif
 
 	return 0;
 }
@@ -407,15 +413,15 @@ int main(int argc, char **argv)
 		}
 	}
 
-	/* Get start time */
-	struct timespec start, end;
-	clock_gettime(CLOCK_MONOTONIC, &start);
-
 	ret = nettlp_init(&nt);
 	if (ret < 0) {
 		perror("nettlp_init");
 		return ret;
 	}
+
+	/* Get start time */
+	struct timespec start, end;
+	clock_gettime(CLOCK_MONOTONIC, &start);
 
 	addr = find_init_task_from_systemmap(map);
 	if (addr == 0) {

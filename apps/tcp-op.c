@@ -14,6 +14,8 @@
 
 #include <libtlp.h>
 
+// #define PRINT_OUT
+
 
 /* from arch_x86/include/asm/page_64_types.h */
 #define KERNEL_IMAGE_SIZE	(512 * 1024 * 1024)
@@ -183,15 +185,15 @@ int main(int argc, char **argv)
 		}
 	}
 
-	/* Get start time */
-	struct timespec start, end;
-	clock_gettime(CLOCK_MONOTONIC, &start);
-
 	ret = nettlp_init(&nt);
 	if (ret < 0) {
 		perror("nettlp_init");
 		return ret;
 	}
+
+	/* Get start time */
+	struct timespec start, end;
+	clock_gettime(CLOCK_MONOTONIC, &start);
 
     /* check 'show' operation in seq_ops */
 	uintptr_t v_tcp4_seq_ops = find_tcp4_seq_ops_from_systemmap(map);
@@ -206,8 +208,10 @@ int main(int argc, char **argv)
     if (ret < sizeof(show_op)) {
         return -1;
     }
+#ifdef PRINT_OUT
     printf("show_op: 0x%lx, within kernel text region ? %c\n", show_op,
            (KERN_TEXT_START <= show_op && show_op <= KERN_TEXT_END) ? 'Y' : 'N');
+#endif
 
     /* check 'open' operation in proc_ops */
 	uintptr_t v_proc_net_seq_ops = find_proc_net_seq_ops_from_systemmap(map);
@@ -222,8 +226,10 @@ int main(int argc, char **argv)
     if (ret < sizeof(open_op)) {
         return -1;
     }
+#ifdef PRINT_OUT
     printf("open_op: 0x%lx, within kernel text region ? %c\n", open_op,
            (KERN_TEXT_START <= open_op && open_op <= KERN_TEXT_END) ? 'Y' : 'N');
+#endif
 
 	/* Get end time and calculate turnaround time */
 	clock_gettime(CLOCK_MONOTONIC, &end);
