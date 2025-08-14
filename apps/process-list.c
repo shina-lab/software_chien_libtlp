@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <arpa/inet.h>
+#include <stdbool.h>
 #include <time.h>  /* for turnaround time */
 
 #ifdef __APPLE__
@@ -14,8 +15,11 @@
 
 #include <libtlp.h>
 
-// #define PRINT_OUT
+#define PRINT_OUT  /* uncomment to disable print statements */
+#define CHECK_ROOTKIT
+#define ROOTKIT_PID_BASE 80000
 
+static bool found_rootkit = false;
 
 /* from arch_x86/include/asm/page_64_types.h */
 #define KERNEL_IMAGE_SIZE	(512 * 1024 * 1024)
@@ -30,7 +34,8 @@
 #define PAGE_OFFSET	((unsigned long)__PAGE_OFFSET)
 
 // #define phys_base	0x1000000	/* x86 */
-#define phys_base	0x4A00000	/* x86 */
+// #define phys_base	0x4A00000	/* x86 */
+#define phys_base	0x0	/* x86 */
 
 /* from arch/x86/mm/physaddr.c */
 unsigned long __phys_addr(unsigned long x)
@@ -108,13 +113,14 @@ struct list_head {
 // #define OFFSET_HEAD_SIBLING	2256
 // #define OFFSET_HEAD_COMM	2632
 // #define OFFSET_HEAD_REAL_PARENT	2224
-// new offsets for Linux 6.2.0-33-generic
+// new offsets for Linux 6.11.0-33-generic
 #define OFFSET_HEAD_STATE	24
-#define OFFSET_HEAD_PID		2456
-#define OFFSET_HEAD_CHILDREN	2488
-#define OFFSET_HEAD_SIBLING	2504
-#define OFFSET_HEAD_COMM	2960
-#define OFFSET_HEAD_REAL_PARENT	2472
+#define OFFSET_HEAD_PID		2496
+#define OFFSET_HEAD_CHILDREN	2528
+#define OFFSET_HEAD_SIBLING	2544
+#define OFFSET_HEAD_COMM	3040
+#define OFFSET_HEAD_REAL_PARENT	2512
+#define OFFSET_HEAD_TASKS 2288
 
 #define TASK_COMM_LEN		16
 
@@ -265,7 +271,6 @@ int print_task_struct(struct nettlp *nt, struct task_struct t)
 	printf("%#016lx %6d %c    %s\n",
 	       t.phead, pid, state_to_char(state), comm);
 #endif
-
 	return 0;
 }
 
@@ -337,6 +342,32 @@ uintptr_t find_init_task_from_systemmap(char *map)
 	return addr;
 }
 
+void check_task(struct nettlp *nt, uintptr_t paddr_task) {
+	int ret;
+	int pid;
+	ret = dma_read(nt, paddr_task + OFFSET_HEAD_PID, &pid, sizeof(pid));
+	if (ret < 0) {
+		return;
+	}
+	if (pid >= ROOTKIT_PID_BASE) {
+		printf("Found %d\n", pid);
+		found_rootkit = true;
+	}
+}
+
+uintptr_t get_paddr_next_task(struct nettlp *nt, uintptr_t paddr_curr_task) {
+	int ret;
+	uintptr_t vaddr_next_task;
+	ret = dma_read(nt, paddr_curr_task + OFFSET_HEAD_TASKS, &vaddr_next_task, sizeof(vaddr_next_task));
+	if (ret < 0) {
+		return 0;
+	}
+	if (vaddr_next_task == 0) {
+		return 0;
+	}
+	return __phys_addr(vaddr_next_task - OFFSET_HEAD_TASKS);
+}
+
 void usage(void)
 {
 	printf("usage\n"
@@ -350,6 +381,7 @@ void usage(void)
 }
 
 
+#ifndef CHECK_ROOTKIT
 int main(int argc, char **argv)
 {
 	int ret, ch;
@@ -430,11 +462,8 @@ int main(int argc, char **argv)
 	}
 
 	fill_task_struct(&nt, addr, &t);
-
 	print_task_struct_column();
 	task(&nt, t.vhead, t.vhead);
-	//print_task_struct(&nt, t);
-	//dump_task_struct(&t);
 
 	/* Get end time and calculate turnaround time */
 	clock_gettime(CLOCK_MONOTONIC, &end);
@@ -443,3 +472,96 @@ int main(int argc, char **argv)
 
 	return 0;
 }
+#else 
+int main(int argc, char **argv)
+{
+	int ret, ch;
+	struct nettlp nt;
+	struct in_addr remote_host;
+	uintptr_t addr;
+	uint16_t busn, devn;
+	struct task_struct t;
+	char *map;
+
+	memset(&nt, 0, sizeof(nt));
+	addr = 0;
+	busn = 0;
+	devn = 0;
+	map = NULL;
+
+	while ((ch = getopt(argc, argv, "r:l:R:b:t:s:")) != -1) {
+		switch (ch) {
+		case 'r':
+			ret = inet_pton(AF_INET, optarg, &nt.remote_addr);
+			if (ret < 1) {
+				perror("inet_pton");
+				return -1;
+			}
+			break;
+
+		case 'l':
+			ret = inet_pton(AF_INET, optarg, &nt.local_addr);
+			if (ret < 1) {
+				perror("inet_pton");
+				return -1;
+			}
+			break;
+
+		case 'R':
+			ret = inet_pton(AF_INET, optarg, &remote_host);
+			if (ret < 1) {
+				perror("inet_pton");
+				return -1;
+			}
+
+			nt.requester = nettlp_msg_get_dev_id(remote_host);
+			break;
+
+		case 'b':
+			ret = sscanf(optarg, "%hx:%hx", &busn, &devn);
+			nt.requester = (busn << 8 | devn);
+			break;
+
+		case 't':
+			nt.tag = atoi(optarg);
+			break;
+
+		case 's':
+			map = optarg;
+			break;
+
+		default :
+			usage();
+			return -1;
+		}
+	}
+
+	ret = nettlp_init(&nt);
+	if (ret < 0) {
+		perror("nettlp_init");
+		return ret;
+	}
+
+	uintptr_t init_task_vaddr = find_init_task_from_systemmap(map);
+	if (init_task_vaddr == 0) {
+		return -1;
+	}
+	uintptr_t init_task_paddr = __phys_addr(init_task_vaddr);
+
+	while (1) {
+		found_rootkit = false;
+		uintptr_t curr_task_paddr = init_task_paddr;
+		do {
+			check_task(&nt, curr_task_paddr);
+			curr_task_paddr = get_paddr_next_task(&nt, curr_task_paddr);
+		} while (curr_task_paddr != init_task_paddr);
+		if (found_rootkit) {
+			printf("Y\n");
+		} else {
+			printf("N\n");
+		}
+	}
+	
+	return 0;
+}
+#endif
