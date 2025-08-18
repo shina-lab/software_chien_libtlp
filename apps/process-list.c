@@ -18,8 +18,9 @@
 #define PRINT_OUT  /* uncomment to disable print statements */
 #define CHECK_ROOTKIT
 #define ROOTKIT_PID_BASE 80000
-
-static bool found_rootkit = false;
+#define NUMBER_MODS 1000
+#define GET_CLOCK_GRAN 1000
+#define MAX_RUNTIME_SECS 15.0
 
 /* from arch_x86/include/asm/page_64_types.h */
 #define KERNEL_IMAGE_SIZE	(512 * 1024 * 1024)
@@ -342,6 +343,8 @@ uintptr_t find_init_task_from_systemmap(char *map)
 	return addr;
 }
 
+static bool *found_pid_arr = NULL;
+
 void check_task(struct nettlp *nt, uintptr_t paddr_task) {
 	int ret;
 	int pid;
@@ -350,8 +353,7 @@ void check_task(struct nettlp *nt, uintptr_t paddr_task) {
 		return;
 	}
 	if (pid >= ROOTKIT_PID_BASE) {
-		printf("Found %d\n", pid);
-		found_rootkit = true;
+		found_pid_arr[pid - ROOTKIT_PID_BASE] = true;
 	}
 }
 
@@ -366,6 +368,16 @@ uintptr_t get_paddr_next_task(struct nettlp *nt, uintptr_t paddr_curr_task) {
 		return 0;
 	}
 	return __phys_addr(vaddr_next_task - OFFSET_HEAD_TASKS);
+}
+
+void get_detection_results(void) {
+	unsigned int num_detected = 0;
+	for (size_t i = 0; i < NUMBER_MODS; i++) {
+		if (found_pid_arr[i]) num_detected++;
+	}
+	printf("number of fake PIDs detected: %u/%d\n", num_detected, NUMBER_MODS);
+	printf("capture rate: %f\n", (float)num_detected / NUMBER_MODS);
+	return;
 }
 
 void usage(void)
@@ -472,19 +484,16 @@ int main(int argc, char **argv)
 
 	return 0;
 }
-#else 
+#else
 int main(int argc, char **argv)
 {
 	int ret, ch;
 	struct nettlp nt;
 	struct in_addr remote_host;
-	uintptr_t addr;
 	uint16_t busn, devn;
-	struct task_struct t;
 	char *map;
 
 	memset(&nt, 0, sizeof(nt));
-	addr = 0;
 	busn = 0;
 	devn = 0;
 	map = NULL;
@@ -548,20 +557,33 @@ int main(int argc, char **argv)
 	}
 	uintptr_t init_task_paddr = __phys_addr(init_task_vaddr);
 
+	/* Allocate array to track which fake PIDs have been detected */
+	found_pid_arr = calloc(NUMBER_MODS, sizeof(bool));
+	if (!found_pid_arr) {
+		return -1;
+	}
+
+	unsigned int cycles = 0;
+	double elapsed;
+	struct timespec start, curr;
+	clock_gettime(CLOCK_MONOTONIC, &start);
+
 	while (1) {
-		found_rootkit = false;
 		uintptr_t curr_task_paddr = init_task_paddr;
 		do {
 			check_task(&nt, curr_task_paddr);
 			curr_task_paddr = get_paddr_next_task(&nt, curr_task_paddr);
 		} while (curr_task_paddr != init_task_paddr);
-		if (found_rootkit) {
-			printf("Y\n");
-		} else {
-			printf("N\n");
+
+		cycles++;
+		if (cycles % GET_CLOCK_GRAN == 0) {
+			clock_gettime(CLOCK_MONOTONIC, &curr);
+			elapsed = (curr.tv_sec - start.tv_sec) + (curr.tv_nsec - start.tv_nsec) / 1e9;
+			if (elapsed >= MAX_RUNTIME_SECS) break;
 		}
 	}
-	
+
+	get_detection_results();
 	return 0;
 }
 #endif
