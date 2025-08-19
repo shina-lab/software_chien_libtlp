@@ -16,11 +16,12 @@
 #include <libtlp.h>
 
 #define PRINT_OUT  /* uncomment to disable print statements */
-#define CHECK_ROOTKIT
-#define ROOTKIT_PID_BASE 80000
-#define NUMBER_MODS 1000
-#define GET_CLOCK_GRAN 1000
-#define MAX_RUNTIME_SECS 15.0
+// #define POLL   /* uncomment to poll on shared memory region */
+#define CHECK_ROOTKIT  /* comment out to revert to default behavior - check process-list once */
+#define ROOTKIT_PID_BASE 80000  /* base of fake PID */
+#define NUMBER_MODS 1000        /* number of modifications; fake PID ranges from [80,000, 81,000) */
+#define GET_CLOCK_GRAN 1000     /* check clock every 1000 introspection tasks */
+#define MAX_RUNTIME_SECS 10.0   /* number of seconds to run this test for */
 
 /* from arch_x86/include/asm/page_64_types.h */
 #define KERNEL_IMAGE_SIZE	(512 * 1024 * 1024)
@@ -565,15 +566,26 @@ int main(int argc, char **argv)
 
 	unsigned int cycles = 0;
 	double elapsed;
-	struct timespec start, curr;
+
+	/* dbg_start and dbg_end are used to measure time required for one introspection. 
+	*  remove these when doing actual experiments. */
+	struct timespec start, curr, dbg_start, dbg_end;
 	clock_gettime(CLOCK_MONOTONIC, &start);
 
+	double sum = 0.0;
+
+#ifndef POLL
 	while (1) {
+		clock_gettime(CLOCK_MONOTONIC, &dbg_start);
 		uintptr_t curr_task_paddr = init_task_paddr;
 		do {
 			check_task(&nt, curr_task_paddr);
 			curr_task_paddr = get_paddr_next_task(&nt, curr_task_paddr);
 		} while (curr_task_paddr != init_task_paddr);
+		clock_gettime(CLOCK_MONOTONIC, &dbg_end);
+		elapsed = (dbg_end.tv_sec - dbg_start.tv_sec) + (dbg_end.tv_nsec - dbg_start.tv_nsec) / 1e9;
+		printf("introspection time: %f [s]\n", elapsed);
+		sum += elapsed;
 
 		cycles++;
 		if (cycles % GET_CLOCK_GRAN == 0) {
@@ -582,7 +594,29 @@ int main(int argc, char **argv)
 			if (elapsed >= MAX_RUNTIME_SECS) break;
 		}
 	}
+#else
+	const char *NETTLP_RESUME_CPU = "2odified_by_dma_write\0";
+	const unsigned long long shared_mem_phys_addr = 0x317fb000ULL;
+	while (1) {
+		char c;
+		ret = dma_read(&nt, shared_mem_phys_addr, &c, sizeof(c));
+		if (c == '3') {
+			printf("HERE\n");
+			uintptr_t curr_task_paddr = init_task_paddr;
+			do {
+				check_task(&nt, curr_task_paddr);
+				curr_task_paddr = get_paddr_next_task(&nt, curr_task_paddr);
+			} while (curr_task_paddr != init_task_paddr);
+			cycles++;
 
+			dma_write(&nt, shared_mem_phys_addr, NETTLP_RESUME_CPU, 22);
+			if (cycles == NUMBER_MODS) break;
+		}
+	}
+#endif
+
+	double avg_elapsed = sum / cycles;  //! remove later
+	printf("average elapsed time: %f [s]\n", avg_elapsed);  //! remove later
 	get_detection_results();
 	return 0;
 }
